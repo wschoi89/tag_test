@@ -1,0 +1,30 @@
+name: Create Git Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Tag version (e.g., v1.0.0)"
+        required: true
+        default: "1.0"
+        type: string
+
+jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push Git tag
+        run: |
+          TAG_NAME="${{ inputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
